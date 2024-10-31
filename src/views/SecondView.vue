@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import CustomButton from '@/components/common/Button.vue';
-import { useLocale } from '@/composables/useLocale';
-
-const { t } = useLocale();
 
 const router = useRouter();
 const goToHome = () => {
-  router.push('/example');
+  router.push('/');
 };
 </script>
 
 <template>
   <div class="second">
-    <h1>{{ t('messages.secondPageIntro') }}</h1>
-    <p>{{ t('messages.example') }}</p>
-    <custom-button @click="goToHome">{{ t('buttons.next') }}</custom-button>
+    <h1>Voilà un exemple d\'utilisation de vuerouter, c\'est pour te faciliter la vie</h1>
+    <custom-button @click="goToHome">retour</custom-button>
   </div>
 </template>
 

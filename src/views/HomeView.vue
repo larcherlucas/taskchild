@@ -1,12 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import CustomButton from '@/components/common/Button.vue';
-import ListLanguage from '@/components/common/ListLanguage.vue';
-import { useLocale } from '@/composables/useLocale';
-
 
 const router = useRouter();
-const { t } = useLocale();
 const goToSecondPage = () => {
   router.push('/second');
 };
@@ -15,8 +11,8 @@ const goToSecondPage = () => {
 <template>
   <div class="home">
     <ListLanguage />
-    <h1>{{ t('messages.homeIntro') }}</h1>
-    <custom-button @click="goToSecondPage">{{ t('buttons.next') }}</custom-button>
+    <h1>Hello tout le monde voici une base vue3 sur laquelle tu peux travailler</h1>
+    <custom-button @click="goToSecondPage">Suivant</custom-button>
   </div>
 </template>
 
