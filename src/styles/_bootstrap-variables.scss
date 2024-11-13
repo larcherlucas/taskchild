@@ -1,0 +1,33 @@
+// Override des variables Bootstrap avec vos variables personnalisées
+$primary: var(--color-primary);
+$secondary: var(--color-background-soft);
+$success: #28a745;
+$info: #17a2b8;
+$warning: #ffc107;
+$danger: var(--color-danger);
+$light: var(--color-background);
+$dark: #343a40;
+
+// Personnalisation des composants Bootstrap
+$body-bg: var(--color-background);
+$body-color: var(--color-text);
+$border-radius: var(--border-radius);
+$border-color: var(--color-border);
+
+// Personnalisation des boutons
+$btn-padding-y: 0.75rem;
+$btn-padding-x: 1.25rem;
+$btn-font-size: 1rem;
+$btn-border-radius: var(--border-radius);
+
+// Personnalisation des tables
+$table-cell-padding-y: 0.75rem;
+$table-cell-padding-x: 0.75rem;
+$table-border-color: var(--color-border);
+$table-hover-bg: var(--color-background-soft);
+
+// Autres personnalisations Bootstrap si nécessaire
+$input-btn-padding-y: 0.5rem;
+$input-btn-padding-x: 0.75rem;
+$input-border-color: var(--color-border);
+$input-border-radius: var(--border-radius);
