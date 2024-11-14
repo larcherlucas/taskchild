@@ -126,25 +126,37 @@ export default defineComponent({
     });
 
     const handleSubmit = async () => {
-      if (!isFormValid.value) {
-        errorMessage.value = 'Please fill in all the fields correctly!';
-        return;
-      }
+  if (!isFormValid.value) {
+    if (!name.value) {
+      errorMessage.value = 'Name is required';
+    } else if (!email.value) {
+      errorMessage.value = 'Email is required';
+    } else if (!password.value || password.value.length < 8) {
+      errorMessage.value = 'Password must be at least 8 characters';
+    } else if (password.value !== confirmPassword.value) {
+      errorMessage.value = 'Passwords do not match';
+    }
+    return;
 
-      try {
-        isLoading.value = true;
-        errorMessage.value = '';
-        
-        await authStore.signup(email.value, password.value, name.value);
-        router.push('/login');
-      } catch (error) {
-        errorMessage.value = error instanceof Error 
-          ? error.message 
-          : 'Oops, an error occurred!';
-      } finally {
-        isLoading.value = false;
-      }
-    };
+  }
+
+  try {
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    const user = { name: name.value, email: email.value, password: password.value };
+    localStorage.setItem('user', JSON.stringify(user));
+
+    await authStore.signup(name.value, email.value, password.value);
+    router.push('/login'); 
+  } catch (error) {
+    errorMessage.value = error instanceof Error 
+      ? error.message 
+      : 'Oops, an error occurred!';
+  } finally {
+    isLoading.value = false;
+  }
+};
 
     return {
       name,

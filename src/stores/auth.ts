@@ -20,23 +20,39 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     login(email: string, password: string) {
-      // Exemple d'utilisateur stocké en dur
       const mockUser = {
         id: '1',
         name: 'Lucas',
         email: 'lucas.larcher@exemple.com',
-        password: 'password123', // Mot de passe simulé
+        password: 'password123',
       };
 
       if (email === mockUser.email && password === mockUser.password) {
         this.token = 'dummy-token';  // Générer un token simulé
         this.user = mockUser;
         this.rememberMe = false;
-        this.saveToken();  // Sauvegarder le token dans localStorage
+        this.saveToken();
         return true;
       } else {
         throw new Error('Invalid credentials');
       }
+    },
+
+    // Nouvelle méthode signup pour l'inscription
+    signup(name: string, email: string, password: string) {
+      // Exemple d'inscription simulée (vous pouvez remplacer ceci par un appel API)
+      const mockNewUser = {
+        id: '2',
+        name: name,
+        email: email,
+        password: password,  // Vous devez probablement hacher le mot de passe dans une application réelle
+      };
+
+      this.user = mockNewUser;
+      this.token = 'dummy-token'; // Générer un token simulé
+      this.saveToken();
+
+      return true;  // Retourne true si l'inscription réussie
     },
 
     saveToken() {

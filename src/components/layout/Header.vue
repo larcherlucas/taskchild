@@ -64,7 +64,10 @@ import { useAppStore, type AppStore } from '@/stores/app';
 import { computed, ref, watch, onMounted } from 'vue';
 
 const appStore: AppStore = useAppStore();
-const goalValue = ref(appStore.goal);
+
+// Retrieve the goal from localStorage if available, otherwise use the appStore goal
+const savedGoal = localStorage.getItem('goal');
+const goalValue = ref(savedGoal ? Number(savedGoal) : appStore.goal);
 
 const totalStars = computed(() => {
   if (goalValue.value && appStore.totalStars > goalValue.value) {
@@ -100,6 +103,7 @@ const messageClass = computed(() => {
   return 'text-white-50';
 });
 
+// Watch for changes to goalValue and update localStorage
 watch(goalValue, (newValue) => {
   if (newValue < totalStars.value) {
     setTimeout(() => {
@@ -108,6 +112,11 @@ watch(goalValue, (newValue) => {
     }, 0);
     return;
   }
+
+  // Save the new goal value to localStorage
+  localStorage.setItem('goal', newValue.toString());
+
+  // Optionally, update the store if needed
   appStore.setGoal(newValue);
 });
 </script>

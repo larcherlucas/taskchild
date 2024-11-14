@@ -174,11 +174,33 @@ let deleteModal: any = null;
 let editModal: any = null;
 let logoutModal: any = null;
 
+const saveToLocalStorage = () => {
+  localStorage.setItem('activities', JSON.stringify(activities.value));
+  localStorage.setItem('schedule', JSON.stringify(schedule.value));
+};
+
+const loadFromLocalStorage = () => {
+  const savedActivities = localStorage.getItem('activities');
+  const savedSchedule = localStorage.getItem('schedule');
+  
+  if (savedActivities) {
+    activities.value = JSON.parse(savedActivities);
+  }
+  
+  if (savedSchedule) {
+    appStore.schedule = JSON.parse(savedSchedule);
+  }
+};
+
+// Appeler `loadFromLocalStorage` lorsque le composant est monté
 onMounted(() => {
+  loadFromLocalStorage();
+  // Initialiser les modaux comme avant
   deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
   editModal = new bootstrap.Modal(document.getElementById('editModal'));
   logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
 });
+
 
 const toggleDarkMode = () => {
   isDarkMode.value = !isDarkMode.value;
@@ -188,6 +210,7 @@ const toggleDarkMode = () => {
 
 const toggleStar = (index: number, day: string) => {
   appStore.toggleStar(index, day);
+  saveToLocalStorage();
 };
 
 const addActivity = () => {
@@ -201,6 +224,7 @@ const addActivity = () => {
     saturday: '',
     sunday: ''
   });
+  saveToLocalStorage();
 };
 
 const confirmDelete = (index: number) => {
@@ -212,6 +236,7 @@ const deleteActivity = () => {
   if (deleteIndex.value !== null) {
     activities.value.splice(deleteIndex.value, 1);
     appStore.schedule.splice(deleteIndex.value, 1);
+    saveToLocalStorage();
     deleteModal?.hide();
     deleteIndex.value = null;
   }
@@ -228,6 +253,7 @@ const saveEditedActivity = () => {
     activities.value[editModalIndex.value].name = editedActivity.value.name;
     editModal?.hide();
     editModalIndex.value = null;
+    saveToLocalStorage();
   }
 };
 

@@ -187,83 +187,85 @@
 import { ref, onMounted } from 'vue';
 
 interface Reward {
-name: string;
-stars: number;
-editing: boolean;
+  name: string;
+  stars: number;
+  editing: boolean;
 }
 
 const showSecret = ref(false);
 const balloonMove = ref(false);
 let modals = {
-rules: null as any,
-rewards: null as any,
-parents: null as any
+  rules: null as any,
+  rewards: null as any,
+  parents: null as any
 };
 
-const rewards = ref<Reward[]>([
-{ name: "1h de jeux vidéo", stars: 10, editing: false },
-{ name: "Sortie au parc", stars: 20, editing: false },
-{ name: "Film au choix", stars: 15, editing: false }
+// Initialisation des récompenses à partir du localStorage ou valeurs par défaut
+const rewards = ref<Reward[]>(JSON.parse(localStorage.getItem('rewards') || '[]') || [
+  { name: "1h de jeux vidéo", stars: 10, editing: false },
+  { name: "Sortie au parc", stars: 20, editing: false },
+  { name: "Film au choix", stars: 15, editing: false }
 ]);
 
 onMounted(() => {
-// Initialiser les modales Bootstrap
-modals.rules = new bootstrap.Modal(document.getElementById('rulesModal'));
-modals.rewards = new bootstrap.Modal(document.getElementById('rewardsModal'));
-modals.parents = new bootstrap.Modal(document.getElementById('parentsModal'));
+  // Initialiser les modales Bootstrap
+  modals.rules = new bootstrap.Modal(document.getElementById('rulesModal'));
+  modals.rewards = new bootstrap.Modal(document.getElementById('rewardsModal'));
+  modals.parents = new bootstrap.Modal(document.getElementById('parentsModal'));
 });
-const hideBalloon = ref(false); 
 
 const handleBalloonClick = () => {
   showSecret.value = true;
-  balloonMove.value = true; 
+  balloonMove.value = true;
   setTimeout(() => {
-    hideBalloon.value = true; 
-    setTimeout(() => {
-      showSecret.value = false;
-      hideBalloon.value = false; 
-      balloonMove.value = false; 
-    }, 1000); 
-  }, 3000); 
+    showSecret.value = false;
+    balloonMove.value = false;
+  }, 3000);
 };
 
 const showRulesModal = () => {
-modals.rules?.show();
+  modals.rules?.show();
 };
 
 const showRewardsModal = () => {
-modals.rewards?.show();
+  modals.rewards?.show();
 };
 
 const showParentsModal = () => {
-modals.parents?.show();
+  modals.parents?.show();
 };
 
 const addReward = () => {
-rewards.value.push({
-  name: "Nouvelle récompense",
-  stars: 1,
-  editing: true
-});
+  const newReward: Reward = { name: "Nouvelle récompense", stars: 1, editing: true };
+  rewards.value.push(newReward);
+  saveRewardsToLocalStorage(); // Enregistrer dans le localStorage après ajout
 };
 
 const editReward = (index: number) => {
-rewards.value[index].editing = true;
+  rewards.value[index].editing = true;
 };
 
 const saveReward = (index: number) => {
-const reward = rewards.value[index];
-if (reward.name.trim() && reward.stars > 0) {
-  reward.editing = false;
-}
+  const reward = rewards.value[index];
+  if (reward.name.trim() && reward.stars > 0) {
+    reward.editing = false;
+    saveRewardsToLocalStorage(); // Enregistrer dans le localStorage après modification
+  }
 };
 
 const deleteReward = (index: number) => {
-if (confirm('Es-tu sûr de vouloir supprimer cette récompense ?')) {
-  rewards.value.splice(index, 1);
-}
+  if (confirm('Es-tu sûr de vouloir supprimer cette récompense ?')) {
+    rewards.value.splice(index, 1);
+    saveRewardsToLocalStorage(); // Enregistrer dans le localStorage après suppression
+  }
+};
+
+// Fonction pour sauvegarder les récompenses dans le localStorage
+const saveRewardsToLocalStorage = () => {
+  localStorage.setItem('rewards', JSON.stringify(rewards.value));
 };
 </script>
+
 
 <style scoped>
 .footer {

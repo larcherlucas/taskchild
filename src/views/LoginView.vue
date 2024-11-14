@@ -97,7 +97,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { Modal } from 'bootstrap';
@@ -114,33 +114,40 @@ export default defineComponent({
     const isLoading = ref(false);
     const errorMessage = ref('');
 
+    onMounted(() => {
+      const rememberMe = localStorage.getItem('rememberMe');
+      if (rememberMe === 'true') {
+        email.value = localStorage.getItem('email') || '';
+        rememberMe.value = true;
+      }
+    });
+
     const handleLogin = async () => {
       try {
         isLoading.value = true;
         errorMessage.value = '';
-        
+
         const isValid = await authStore.login(email.value, password.value);
-        
+
         if (isValid) {
           if (rememberMe.value) {
-            // Implémenter la logique "Se souvenir de moi"
             localStorage.setItem('rememberMe', 'true');
+            localStorage.setItem('email', email.value);
+          } else {
+            localStorage.removeItem('rememberMe');
+            localStorage.removeItem('email');
           }
 
-          // Ouvrir la modale de chargement
           const weeklyReportModal = new Modal(document.getElementById('weeklyReportModal')!);
           weeklyReportModal.show();
 
-          // Simuler le chargement du tableau de la semaine
           setTimeout(() => {
             weeklyReportModal.hide();
             router.push('/');
           }, 3000);
         }
       } catch (error) {
-        errorMessage.value = error instanceof Error 
-          ? error.message 
-          : 'Une erreur est survenue lors de la connexion';
+        errorMessage.value = error instanceof Error ? error.message : 'Une erreur est survenue lors de la connexion';
       } finally {
         isLoading.value = false;
       }
