@@ -1,62 +1,66 @@
 <template>
-  <div class="container mt-5">
+  <div class="container my-5">
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm border-0 rounded-3 bg-light">
           <div class="card-body p-4">
-            <h2 class="text-center mb-4">Inscription</h2>
+            <h2 class="text-center mb-4 text-primary">Let's Sign Up!</h2>
             
             <form @submit.prevent="handleSubmit">
               <div class="form-floating mb-3">
                 <input 
                   type="text" 
-                  class="form-control" 
+                  class="form-control border-primary" 
                   id="name"
-                  placeholder="Votre nom"
+                  placeholder="Your Name"
                   v-model="name" 
                   required
                 />
-                <label for="name">Nom complet</label>
+                <label for="name" class="text-muted">Full Name</label>
               </div>
 
               <div class="form-floating mb-3">
                 <input 
                   type="email" 
-                  class="form-control" 
+                  class="form-control border-primary" 
                   id="email"
-                  placeholder="nom@exemple.com"
+                  placeholder="your@email.com"
                   v-model="email" 
                   required
                 />
-                <label for="email">Adresse email</label>
+                <label for="email" class="text-muted">Email Address</label>
               </div>
 
               <div class="form-floating mb-3">
                 <input 
                   type="password" 
-                  class="form-control" 
+                  class="form-control border-primary" 
                   id="password"
-                  placeholder="Mot de passe"
+                  placeholder="Your Password"
                   v-model="password"
                   required
                   pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
                 />
-                <label for="password">Mot de passe</label>
-                <div class="form-text">
-                  Le mot de passe doit contenir au moins 8 caractères, une lettre et un chiffre
+                <label for="password" class="text-muted">Password</label>
+                <div class="form-text text-muted">
+                  Password must be at least 8 letters and numbers
                 </div>
               </div>
 
               <div class="form-floating mb-3">
                 <input 
                   type="password" 
-                  class="form-control" 
+                  class="form-control border-primary" 
+                  :class="{ 'is-invalid': password !== confirmPassword }" 
                   id="confirmPassword"
-                  placeholder="Confirmez le mot de passe"
+                  placeholder="Confirm Your Password"
                   v-model="confirmPassword"
                   required
                 />
-                <label for="confirmPassword">Confirmer le mot de passe</label>
+                <label for="confirmPassword" class="text-muted">Confirm Password</label>
+                <div class="invalid-feedback">
+                  Passwords do not match
+                </div>
               </div>
 
               <div class="d-grid gap-2">
@@ -69,16 +73,16 @@
                     v-if="isLoading" 
                     class="spinner-border spinner-border-sm me-2"
                   ></span>
-                  {{ isLoading ? 'Inscription...' : 'S\'inscrire' }}
+                  {{ isLoading ? 'Signing Up...' : 'Sign Up' }}
                 </button>
               </div>
             </form>
 
             <div class="text-center mt-3">
-              <p class="mb-0">
-                Déjà inscrit? 
+              <p class="mb-0 text-muted">
+                Already signed up? 
                 <router-link to="/login" class="text-primary text-decoration-none">
-                  Se connecter
+                  Log In
                 </router-link>
               </p>
             </div>
@@ -123,7 +127,7 @@ export default defineComponent({
 
     const handleSubmit = async () => {
       if (!isFormValid.value) {
-        errorMessage.value = 'Veuillez remplir correctement tous les champs';
+        errorMessage.value = 'Please fill in all the fields correctly!';
         return;
       }
 
@@ -136,7 +140,7 @@ export default defineComponent({
       } catch (error) {
         errorMessage.value = error instanceof Error 
           ? error.message 
-          : 'Une erreur est survenue lors de l\'inscription';
+          : 'Oops, an error occurred!';
       } finally {
         isLoading.value = false;
       }
@@ -155,3 +159,28 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss">
+.form-control {
+  border-color: #5c6bc0;
+  
+  &:focus {
+    border-color: #3949ab;
+    box-shadow: 0 0 0 0.2rem rgba(92, 107, 192, 0.25);
+  }
+
+  &.is-invalid {
+    border-color: #f44336;
+  }
+}
+
+.btn-primary {
+  background-color: #5c6bc0;
+  border-color: #5c6bc0;
+
+  &:hover {
+    background-color: #3949ab;
+    border-color: #3949ab;
+  }
+}
+</style>

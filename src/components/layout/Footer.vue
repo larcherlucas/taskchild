@@ -212,10 +212,19 @@ modals.rules = new bootstrap.Modal(document.getElementById('rulesModal'));
 modals.rewards = new bootstrap.Modal(document.getElementById('rewardsModal'));
 modals.parents = new bootstrap.Modal(document.getElementById('parentsModal'));
 });
+const hideBalloon = ref(false); 
 
 const handleBalloonClick = () => {
-balloonMove.value = !balloonMove.value;
-showSecret.value = true;
+  showSecret.value = true;
+  balloonMove.value = true; 
+  setTimeout(() => {
+    hideBalloon.value = true; 
+    setTimeout(() => {
+      showSecret.value = false;
+      hideBalloon.value = false; 
+      balloonMove.value = false; 
+    }, 1000); 
+  }, 3000); 
 };
 
 const showRulesModal = () => {

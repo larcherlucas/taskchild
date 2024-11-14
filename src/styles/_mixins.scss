@@ -1,15 +1,35 @@
 @use "sass:map";
 
+// Mixin pour les media queries
 @mixin respond-to($breakpoint) {
-    @if map.has-key($breakpoints, $breakpoint) {
-        @media (min-width: map.get($breakpoints, $breakpoint)) {
-            @content;
-        }
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint)) {
+      @content;
     }
+  }
 }
 
+// Mixin pour centrer avec flexbox
 @mixin flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Mixin pour reset les border-radius des boutons groupés
+@mixin border-radius-reset {
+  &:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  
+  &:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+// Mixin pour les transitions
+@mixin smooth-transition {
+  transition: all 0.3s ease;
 }
