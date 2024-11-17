@@ -19,52 +19,45 @@ export const useAuthStore = defineStore('auth', {
     rememberMe: false,
   }),
   actions: {
-    login(email: string, password: string) {
+    login(password: string) {
+      const DEMO_PASSWORD = 'VueEstLeMaitreDuFront';
       const mockUser = {
         id: '1',
         name: 'Lucas',
-        email: 'lucas.larcher@exemple.com',
-        password: 'password123',
+        email: 'lucas@example.com',
       };
 
-      if (email === mockUser.email && password === mockUser.password) {
+      if (password === DEMO_PASSWORD) {
         this.token = 'dummy-token';  // Générer un token simulé
         this.user = mockUser;
         this.rememberMe = false;
         this.saveToken();
         return true;
       } else {
-        throw new Error('Invalid credentials');
+        throw new Error('Mot de passe incorrect - Utilisez le mot de passe fourni dans la modale');
       }
-    },
-
-    // Nouvelle méthode signup pour l'inscription
-    signup(name: string, email: string, password: string) {
-      // Exemple d'inscription simulée (vous pouvez remplacer ceci par un appel API)
-      const mockNewUser = {
-        id: '2',
-        name: name,
-        email: email,
-        password: password,  // Vous devez probablement hacher le mot de passe dans une application réelle
-      };
-
-      this.user = mockNewUser;
-      this.token = 'dummy-token'; // Générer un token simulé
-      this.saveToken();
-
-      return true;  // Retourne true si l'inscription réussie
     },
 
     saveToken() {
       if (this.rememberMe) {
         localStorage.setItem('authToken', this.token as string);
+        localStorage.setItem('user', JSON.stringify(this.user));
       } else {
         sessionStorage.setItem('authToken', this.token as string);
+        sessionStorage.setItem('user', JSON.stringify(this.user));
       }
     },
 
     loadToken() {
       this.token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken') || null;
+      const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+      if (userStr) {
+        try {
+          this.user = JSON.parse(userStr);
+        } catch {
+          this.user = null;
+        }
+      }
     },
 
     logout() {
@@ -72,7 +65,13 @@ export const useAuthStore = defineStore('auth', {
       this.user = null;
       this.rememberMe = false;
       localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
       sessionStorage.removeItem('authToken');
+      sessionStorage.removeItem('user');
     },
+  },
+  getters: {
+    isAuthenticated: (state) => !!state.token && !!state.user,
+    currentUser: (state) => state.user,
   },
 });

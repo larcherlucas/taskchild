@@ -9,19 +9,7 @@
             <form @submit.prevent="handleLogin">
               <div class="form-floating mb-3">
                 <input 
-                  type="email" 
-                  class="form-control border-primary" 
-                  id="email"
-                  placeholder="nom@exemple.com"
-                  v-model="email" 
-                  required
-                />
-                <label for="email" class="text-muted">Adresse email</label>
-              </div>
-
-              <div class="form-floating mb-3">
-                <input 
-                  type="password" 
+                  :type="showPassword ? 'text' : 'password'"
                   class="form-control border-primary" 
                   id="password"
                   placeholder="Mot de passe"
@@ -29,6 +17,18 @@
                   required
                 />
                 <label for="password" class="text-muted">Mot de passe</label>
+              </div>
+
+              <div class="form-check mb-3">
+                <input 
+                  type="checkbox"
+                  class="form-check-input"
+                  id="showPass"
+                  v-model="showPassword"
+                />
+                <label class="form-check-label text-muted" for="showPass">
+                  Afficher le mot de passe
+                </label>
               </div>
 
               <div class="form-check mb-3">
@@ -58,15 +58,6 @@
               </div>
             </form>
 
-            <div class="text-center mt-3">
-              <p class="mb-0 text-muted">
-                Pas encore de compte? 
-                <router-link to="/signup" class="text-primary text-decoration-none">
-                  S'inscrire
-                </router-link>
-              </p>
-            </div>
-
             <div v-if="errorMessage" class="alert alert-danger mt-3" role="alert">
               {{ errorMessage }}
             </div>
@@ -76,12 +67,57 @@
     </div>
   </div>
 
-  <div class="modal fade" id="weeklyReportModal" tabindex="-1" aria-labelledby="weeklyReportModalLabel" aria-hidden="true">
+  <!-- Modale de sécurité -->
+  <div class="modal fade" id="securityModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="weeklyReportModalLabel">Chargement du tableau de la semaine</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+          <h5 class="modal-title">Information de Sécurité</h5>
+          <button type="button" class="btn-close" @click="closeSecurityModal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-warning">
+            <div class="text-container position-relative">
+              <p class="warning-text mb-3" :class="{ 'fade-out': !isMessageVisible }">
+                Ceci n'est pas une app sécurisée, ne met aucunes informations sensibles et utilise le mot de passe suivant:
+              </p>
+              <p class="alternate-text mb-3" :class="{ 'fade-in': !isMessageVisible }">
+                You Do It
+              </p>
+            </div>
+            
+            <div class="form-check mb-3">
+              <input 
+                type="checkbox"
+                class="form-check-input"
+                id="showModalPass"
+                v-model="showModalPassword"
+              />
+              <label class="form-check-label" for="showModalPass">
+                Afficher le mot de passe
+              </label>
+            </div>
+
+            <h3 class="mt-2 text-center">
+              {{ showModalPassword ? 'VueEstLeMaitreDuFront' : '••••••••••••••••••' }}
+            </h3>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="closeSecurityModal">
+            J'ai compris
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale de chargement -->
+  <div class="modal fade" id="loadingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Chargement en cours</h5>
         </div>
         <div class="modal-body">
           <div class="d-flex justify-content-center">
@@ -97,75 +133,158 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
 import { Modal } from 'bootstrap';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 export default defineComponent({
   name: 'LoginView',
   setup() {
     const router = useRouter();
-    const authStore = useAuthStore();
-
-    const email = ref('');
+    
     const password = ref('');
     const rememberMe = ref(false);
     const isLoading = ref(false);
     const errorMessage = ref('');
+    const showPassword = ref(false);
+    const showModalPassword = ref(false);
+    const isMessageVisible = ref(true);
+    
+    let securityModal: Modal | null = null;
+    let loadingModal: Modal | null = null;
+    let fadeInterval: number | null = null;
 
-    onMounted(() => {
-      const rememberMe = localStorage.getItem('rememberMe');
-      if (rememberMe === 'true') {
-        email.value = localStorage.getItem('email') || '';
-        rememberMe.value = true;
+    const showSecurityModal = () => {
+      const modalEl = document.getElementById('securityModal');
+      if (modalEl) {
+        securityModal = new Modal(modalEl, {
+          backdrop: 'static',
+          keyboard: false
+        });
+        securityModal.show();
       }
-    });
+    };
+
+    const closeSecurityModal = () => {
+      if (securityModal) {
+        securityModal.hide();
+      }
+    };
+
+    const showLoadingModal = () => {
+      const modalEl = document.getElementById('loadingModal');
+      if (modalEl) {
+        loadingModal = new Modal(modalEl, {
+          backdrop: 'static',
+          keyboard: false
+        });
+        loadingModal.show();
+      }
+    };
 
     const handleLogin = async () => {
       try {
         isLoading.value = true;
         errorMessage.value = '';
-
-        const isValid = await authStore.login(email.value, password.value);
-
-        if (isValid) {
+        
+        // Simuler la vérification du mot de passe
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        if (password.value === 'VueEstLeMaitreDuFront') {
           if (rememberMe.value) {
             localStorage.setItem('rememberMe', 'true');
-            localStorage.setItem('email', email.value);
           } else {
             localStorage.removeItem('rememberMe');
-            localStorage.removeItem('email');
           }
-
-          const weeklyReportModal = new Modal(document.getElementById('weeklyReportModal')!);
-          weeklyReportModal.show();
-
+          
+          // Afficher la modale de chargement
+          showLoadingModal();
+          
+          // Simuler un chargement
           setTimeout(() => {
-            weeklyReportModal.hide();
+            if (loadingModal) {
+              loadingModal.hide();
+            }
             router.push('/');
           }, 3000);
+        } else {
+          errorMessage.value = 'Mot de passe incorrect';
         }
       } catch (error) {
-        errorMessage.value = error instanceof Error ? error.message : 'Une erreur est survenue lors de la connexion';
+        errorMessage.value = 'Une erreur est survenue';
       } finally {
         isLoading.value = false;
       }
     };
 
+    onMounted(() => {
+      showSecurityModal();
+      fadeInterval = window.setInterval(() => {
+        isMessageVisible.value = !isMessageVisible.value;
+      }, 3000);
+
+      const rememberMeValue = localStorage.getItem('rememberMe');
+      if (rememberMeValue === 'true') {
+        rememberMe.value = true;
+      }
+    });
+
+    onUnmounted(() => {
+      if (fadeInterval) {
+        clearInterval(fadeInterval);
+      }
+    });
+
     return {
-      email,
       password,
       rememberMe,
       isLoading,
       errorMessage,
+      showPassword,
+      showModalPassword,
+      isMessageVisible,
       handleLogin,
+      closeSecurityModal
     };
-  },
+  }
 });
 </script>
 
 <style lang="scss">
+.text-container {
+  position: relative;
+  height: 48px;
+}
+
+.warning-text,
+.alternate-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transition: opacity 1.5s ease-in-out;
+  margin: 0;
+}
+
+.warning-text {
+  opacity: 1;
+  
+  &.fade-out {
+    opacity: 0;
+  }
+}
+
+.alternate-text {
+  opacity: 0;
+  color: #664d03;
+  font-weight: bold;
+  
+  &.fade-in {
+    opacity: 1;
+  }
+}
+
 .form-control {
   border-color: #5c6bc0;
   
@@ -183,5 +302,21 @@ export default defineComponent({
     background-color: #3949ab;
     border-color: #3949ab;
   }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.modal-content {
+  border-radius: 0.5rem;
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffecb5;
+  color: #664d03;
 }
 </style>
